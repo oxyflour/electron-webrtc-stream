@@ -1,0 +1,22 @@
+{
+  "name": "elertc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babylonjs": "^4.2.0",
+    "electron": "^16.0.5",
+    "event-emitter": "^0.3.5",
+    "polka": "^0.5.2",
+    "vite": "^2.7.3"
+  },
+  "devDependencies": {
+    "@types/event-emitter": "^0.3.3"
+  }
+}
