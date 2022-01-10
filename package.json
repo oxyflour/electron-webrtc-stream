@@ -9,16 +9,21 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.8",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-reconciler": "^0.26.4",
+    "typescript": "^4.5.4",
+    "vite": "^2.7.9"
+  },
   "dependencies": {
-    "babylonjs": "^4.2.0",
-    "electron": "^16.0.5",
-    "event-emitter": "^0.3.5",
-    "polka": "^0.5.2",
+    "@vitejs/plugin-react": "^1.1.4",
+    "electron": "^16.0.6",
+    "events": "^3.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "vite": "^2.7.3"
-  },
-  "devDependencies": {
-    "@types/event-emitter": "^0.3.3"
+    "react-reconciler": "^0.26.2",
+    "ts-node": "^10.4.0"
   }
 }
