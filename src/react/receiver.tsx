@@ -20,8 +20,8 @@ export default function Receiver({ channel, ...rest }: {
 		setErr(null)
 		setPeer({ conn: null, streams: [], channels: [] })
 		setLoading(true)
-		const width = video.scrollWidth,
-			height = video.scrollHeight,
+		const width = video.width = video.scrollWidth,
+			height = video.height = video.scrollHeight,
 			id = Math.random().toString(16).slice(2, 10)
 		try {
 			await api.send('start', { id, opts: { width, height } })

@@ -6,10 +6,11 @@ async function getConstrain({ width, height }: {
 }) {
 	const id = document.title = Math.random().toString(16).slice(2, 10),
 		{ ipcRenderer } = require('electron')
+	await new Promise((resolve) => setTimeout(resolve, 200))
 	const sources = await ipcRenderer.invoke('desktop-get-sources', { types: ['window'] }),
 		source = sources.find(item => item.name.includes(id))
 	if (!source) {
-		throw Error(`source is not found`)
+		throw Error(`source ${id} is not found`)
 	}
 	return {
 		audio: false,
