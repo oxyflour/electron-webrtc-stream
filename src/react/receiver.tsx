@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import connect, { Api } from "../www/connect"
 import recv from "../www/recv"
 
-export default function Receiver({ channel, ...rest }: {
+export default function Receiver({ channel, children, ...rest }: {
 	channel: string
 } & React.DetailedHTMLProps<React.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>) {
 	const ref = useRef<HTMLVideoElement>(),
@@ -18,13 +18,15 @@ export default function Receiver({ channel, ...rest }: {
 
 	async function start(api: Api, video: HTMLVideoElement) {
 		setErr(null)
-		setPeer({ conn: null, streams: [], channels: [] })
 		setLoading(true)
 		const width = video.width = video.scrollWidth,
 			height = video.height = video.scrollHeight,
+			{ devicePixelRatio } = window,
+			{ href } = location,
+			opts = { width, height, devicePixelRatio },
 			id = Math.random().toString(16).slice(2, 10)
 		try {
-			await api.send('start', { id, opts: { width, height } })
+			await api.send('start', { id, opts, href })
 			const peer = await recv(id)
 			video.srcObject = peer.streams[0]
 			video.play()
@@ -44,6 +46,9 @@ export default function Receiver({ channel, ...rest }: {
 	}, [channel])
 
 	useEffect(() => {
+		if (api && video) {
+			start(api, video)
+		}
 		api?.on('pong', ({ now }) => {
 			console.log('ping', Date.now() - now)
 		})
@@ -54,59 +59,65 @@ export default function Receiver({ channel, ...rest }: {
 	}, [api])
 
 	useEffect(() => {
-		let isDown = false
 		const cbs = [
 			'pointerdown', 'pointermove', 'pointerup',
-			'mousedown', 'mousemove', 'mouseup',
-			'click', 'dblclick',
+			'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick',
+			'wheel',
 		].map((type => {
 			function func({ button, clientX, clientY }: PointerEvent | MouseEvent) {
-				if (type.endsWith('down')) isDown = true
-				if (type.endsWith('up')) isDown = false
-				if (type.endsWith('move') && !isDown) return
 				const [channel] = peer.channels
 				channel?.send(JSON.stringify({
-					evt: type.startsWith('pointer') ? 'pointer' : 'mouse',
+					evt: type.startsWith('pointer') ? 'pointer' :
+						type === 'wheel' ? 'wheel' : 'mouse',
 					data: { type, button, clientX, clientY }
 				}))
 			}
 			window.addEventListener(type as any, func)
 			return { type, func } as any
 		}))
+		function onWindowResize() {
+			api && video && start(api, video)
+		}
+		window.addEventListener('resize', onWindowResize)
 		function onStateChange() {
 			const state = peer.conn?.connectionState
-			console.log(state)
 			if (state === 'failed') {
-				setErr('connection ' + state)
+				setErr('connect ' + state)
 			}
 		}
 		peer.conn?.addEventListener('connectionstatechange', onStateChange)
 		return () => {
 			cbs.forEach(({ type, func }) => window.removeEventListener(type, func))
+			window.removeEventListener('resize', onWindowResize)
 			peer.conn?.removeEventListener('connectionstatechange', onStateChange)
+			peer.conn?.close()
 		}
 	}, [peer])
 
 	return <>
-		<div style={{ position: 'absolute', bottom: 0, padding: 8, zIndex: 100 }}>
 		{
-			err && <div>
-				{ err && err.message || `${err}` }
+			(err || loading) &&
+			<div style={{
+				position: 'absolute',
+				zIndex: 100,
+				left: '50%',
+				top: '50%',
+				transform: 'translate(-50%, -50%)',
+				background: '#aaa',
+				textAlign: 'center',
+				padding: 8,
+			}}>
+			{
+				err ? <div style={{ cursor: 'pointer' }}
+						onClick={ () => api && video && start(api, video) }>
+					Error: { `${err && err.meessage || err}` }, click to retry
+				</div> :
+				<div>
+					loading...
+				</div>
+			}
 			</div>
 		}
-		{
-			api && video ? <div>
-				<button
-					disabled={ loading }
-					onClick={ () => start(api, video) }>
-					connect
-				</button>
-			</div> :
-			<div>
-				loading...
-			</div>
-		}
-		</div>
-		<video ref={ ref } { ...rest } />
+		<video muted ref={ ref } style={{ objectFit: 'cover' }} { ...rest } />
 	</>
 }

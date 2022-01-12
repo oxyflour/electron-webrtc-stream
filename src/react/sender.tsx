@@ -6,14 +6,13 @@ export default function Sender({ channel, children }: {
 	channel: string
 	children?: any
 }) {
-	const [err, setErr] = useState<any>(),
-		[api, setApi] = useState<Api | undefined>()
+	const [api, setApi] = useState<Api | undefined>()
 
 	useEffect(() => {
 		let api: Api
 		connect(channel, 'send')
 			.then(ret => setApi(api = ret))
-			.catch(err => setErr(err))
+			.catch(err => console.error(err))
 		return () => api?.close()
 	}, [channel])
 
@@ -34,6 +33,8 @@ export default function Sender({ channel, children }: {
 					elem && elem.dispatchEvent(new PointerEvent(type, params))
 				} else if (evt === 'mouse') {
 					elem && elem.dispatchEvent(new MouseEvent(type, params))
+				} else if (evt === 'wheel') {
+					elem && elem.dispatchEvent(new WheelEvent(type, params))
 				}
 			})
 		})
@@ -50,11 +51,6 @@ export default function Sender({ channel, children }: {
 		return () => clearInterval(timer)
 	}, [api])
 	return <>
-		{
-			err && <div style={{ position: 'absolute', padding: 8, zIndex: 100 }}>
-				{ err && err.message || `${err}` }
-			</div>
-		}
 		{ children }
 	</>
 }

@@ -4,10 +4,11 @@ import { Connect } from 'vite'
 
 const peers = { } as Record<string, { id: string, role: string, res: ServerResponse }[]>
 
-async function start(channel: string) {
-	const cmd = 'npx electron -r ts-node/register src/electron/main.ts',
-		url = `http://localhost:3000?send=${channel}`,
-		env = { ...process.env, STARTUP_URL: url },
+async function start(channel: string, href: string) {
+	const cmd = 'npx electron tool/electron/main.js',
+		url = new URL(href)
+	url.searchParams.set('send', channel)
+	const env = { ...process.env, STARTUP_URL: url.toString() },
 		proc = spawn(cmd, [], { env, shell: true })
 	proc.stdout.pipe(process.stdout)
 	proc.stderr.pipe(process.stderr)
@@ -43,9 +44,9 @@ export default async (req: Connect.IncomingMessage, res: ServerResponse, next: C
 				req.on('end', () => resolve(ret))
 			})
 
-			const { evt } = JSON.parse(`${data}`)
-			if (evt === 'start' && !peers[channel]?.find(peer => peer.role === 'send')) {
-				await start(channel)
+			const val = JSON.parse(`${data}`)
+			if (val.evt === 'start' && !peers[channel]?.find(peer => peer.role === 'send')) {
+				await start(channel, `${val.data?.href}`)
 			}
 
 			const arr = peers[channel] || []

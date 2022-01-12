@@ -1,8 +1,9 @@
 import connect from './connect'
 
-async function getConstrain({ width, height }: {
+async function getConstrain({ width, height, devicePixelRatio }: {
 	width: number
 	height: number
+	devicePixelRatio: number
 }) {
 	const id = document.title = Math.random().toString(16).slice(2, 10),
 		{ ipcRenderer } = require('electron')
@@ -12,16 +13,18 @@ async function getConstrain({ width, height }: {
 	if (!source) {
 		throw Error(`source ${id} is not found`)
 	}
+	const w = (width || 1280) * (devicePixelRatio || 1),
+		h = (height || 720) * (devicePixelRatio || 1)
 	return {
 		audio: false,
 		video: {
 			mandatory: {
 				chromeMediaSource: 'desktop',
 				chromeMediaSourceId: source.id,
-				minWidth: width || 1280,
-				maxWidth: width || 1280,
-				maxHeight: height || 720,
-				minHeight: height || 720,
+				minWidth: w,
+				maxWidth: w,
+				maxHeight: h,
+				minHeight: h,
 			}
 		}
 	}

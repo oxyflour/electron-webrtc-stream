@@ -21,6 +21,6 @@ app.on('window-all-closed', () => {
 	}
 })
 
-ipcMain.handle('desktop-get-sources', async (_: any, opts: any) => {
+ipcMain.handle('desktop-get-sources', async (_, opts) => {
 	return desktopCapturer.getSources(opts)
 })
