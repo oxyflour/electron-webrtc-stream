@@ -5,13 +5,15 @@ async function getConstrain({ width, height, devicePixelRatio }: {
 	height: number
 	devicePixelRatio: number
 }) {
-	const id = document.title = Math.random().toString(16).slice(2, 10),
-		{ ipcRenderer } = require('electron')
-	await new Promise((resolve) => setTimeout(resolve, 200))
-	const sources = await ipcRenderer.invoke('desktop-get-sources', { types: ['window'] }),
-		source = sources.find(item => item.name.includes(id))
+	// Note: it's strange that you can only modify title once
+	if (!document.title.startsWith('-rtc-uuid-')) {
+		document.title = '-rtc-uuid-' + Math.random().toString(16).slice(2, 10)
+	}
+	const { ipcRenderer } = require('electron'),
+		sources = await ipcRenderer.invoke('desktop-get-sources', { types: ['window'] }),
+		source = sources.find(item => item.name.includes(document.title))
 	if (!source) {
-		throw Error(`source ${id} is not found`)
+		throw Error(`source ${document.title} is not found`)
 	}
 	const w = (width || 1280) * (devicePixelRatio || 1),
 		h = (height || 720) * (devicePixelRatio || 1)

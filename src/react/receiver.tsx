@@ -64,13 +64,13 @@ export default function Receiver({ channel, children, ...rest }: {
 			'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick',
 			'wheel',
 		].map((type => {
-			function func({ button, clientX, clientY }: PointerEvent | MouseEvent) {
-				const [channel] = peer.channels
-				channel?.send(JSON.stringify({
-					evt: type.startsWith('pointer') ? 'pointer' :
-						type === 'wheel' ? 'wheel' : 'mouse',
-					data: { type, button, clientX, clientY }
-				}))
+			function func({ button, clientX, clientY, deltaX, deltaY }: any) {
+				const [channel] = peer.channels,
+					evt = type === 'wheel' ? 'wheel' :
+						type.startsWith('pointer') ? 'pointer' :
+						'mouse',
+					data = { type, button, clientX, clientY, deltaX, deltaY }
+				channel?.send(JSON.stringify({ evt, data }))
 			}
 			window.addEventListener(type as any, func)
 			return { type, func } as any
@@ -103,7 +103,7 @@ export default function Receiver({ channel, children, ...rest }: {
 				left: '50%',
 				top: '50%',
 				transform: 'translate(-50%, -50%)',
-				background: '#aaa',
+				background: '#ddd',
 				textAlign: 'center',
 				padding: 8,
 			}}>

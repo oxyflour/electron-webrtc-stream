@@ -28,13 +28,17 @@ export default function Sender({ channel, children }: {
 				const { evt, data } = JSON.parse(event.data),
 					{ type, clientX, clientY, ...rest } = data || { },
 					elem = document.elementFromPoint(clientX, clientY),
-					params = { view: window, bubbles: true, cancelable: true, clientX, clientY, ...rest }
+					params = {
+						view: window, bubbles: true, cancelable: true,
+						clientX, clientY, ...rest
+					}
 				if (evt === 'pointer') {
-					elem && elem.dispatchEvent(new PointerEvent(type, params))
+					elem?.dispatchEvent(new PointerEvent(type, params))
 				} else if (evt === 'mouse') {
-					elem && elem.dispatchEvent(new MouseEvent(type, params))
+					elem?.dispatchEvent(new MouseEvent(type, params))
 				} else if (evt === 'wheel') {
-					elem && elem.dispatchEvent(new WheelEvent(type, params))
+					// FIXME: wheel event not working
+					elem?.dispatchEvent(new MouseEvent(type, params))
 				}
 			})
 		})
