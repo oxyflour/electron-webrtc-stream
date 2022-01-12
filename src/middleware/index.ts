@@ -5,11 +5,16 @@ import { Connect } from 'vite'
 const peers = { } as Record<string, { id: string, role: string, res: ServerResponse }[]>
 
 async function start(channel: string, href: string) {
-	const cmd = 'npx electron tool/electron/main.js',
-		url = new URL(href)
+	const url = new URL(href)
 	url.searchParams.set('send', channel)
-	const env = { ...process.env, STARTUP_URL: url.toString() },
+	// FIXME: xvfb not working
+	const cmd =
+			/*`docker run -e STARTUP_URL="${url.toString()}" nvidia-electron ` +
+			"xvfb-run -a -s='-screen 0 1024x768x24 +extension GLX +render' " + */
+			"npx electron --no-sandbox tool/electron/main.js",
+		env = { ...process.env, STARTUP_URL: url.toString() },
 		proc = spawn(cmd, [], { env, shell: true })
+	console.log(cmd)
 	proc.stdout.pipe(process.stdout)
 	proc.stderr.pipe(process.stderr)
 
