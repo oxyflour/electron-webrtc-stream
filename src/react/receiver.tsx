@@ -1,9 +1,11 @@
+import { debounce } from "debounce"
 import { useEffect, useRef, useState } from "react"
 import connect, { Api } from "../www/connect"
 import recv from "../www/recv"
 
-export default function Receiver({ channel, children, ...rest }: {
+export default function Receiver({ channel, children, peerOpts, ...rest }: {
 	channel: string
+	peerOpts?: RTCConfiguration
 } & React.DetailedHTMLProps<React.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>) {
 	const ref = useRef<HTMLVideoElement>(),
 		video = ref.current,
@@ -27,7 +29,7 @@ export default function Receiver({ channel, children, ...rest }: {
 			id = Math.random().toString(16).slice(2, 10)
 		try {
 			await api.send('start', { id, opts, href })
-			const peer = await recv(id)
+			const peer = await recv(id, peerOpts)
 			video.srcObject = peer.streams[0]
 			video.play()
 			setPeer(peer)
@@ -75,16 +77,9 @@ export default function Receiver({ channel, children, ...rest }: {
 			window.addEventListener(type as any, func)
 			return { type, func } as any
 		}))
-		function onWindowResize() {
-			api && video && start(api, video)
-		}
+		const onWindowResize = debounce(() => api && video && start(api, video), 500)
 		window.addEventListener('resize', onWindowResize)
-		function onStateChange() {
-			const state = peer.conn?.connectionState
-			if (state === 'failed') {
-				setErr('connect ' + state)
-			}
-		}
+		const onStateChange = () => peer.conn?.connectionState === 'failed' && setErr('connect failed')
 		peer.conn?.addEventListener('connectionstatechange', onStateChange)
 		return () => {
 			cbs.forEach(({ type, func }) => window.removeEventListener(type, func))

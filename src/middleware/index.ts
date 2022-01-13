@@ -10,7 +10,7 @@ async function start(channel: string, href: string) {
 	// FIXME: xvfb not working
 	const cmd =
 			/*`docker run -e STARTUP_URL="${url.toString()}" nvidia-electron ` +
-			"xvfb-run -a -s='-screen 0 1024x768x24 +extension GLX +render' " + */
+			"xvfb-run -a -s='-screen 0 1024x768x24' " + */
 			"npx electron --no-sandbox tool/electron/main.js",
 		env = { ...process.env, STARTUP_URL: url.toString() },
 		proc = spawn(cmd, [], { env, shell: true })

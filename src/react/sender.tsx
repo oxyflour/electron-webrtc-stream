@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import connect, { Api } from "../www/connect"
 import send from "../www/send"
 
-export default function Sender({ channel, children }: {
+export default function Sender({ channel, children, peerOpts }: {
 	channel: string
 	children?: any
+	peerOpts?: RTCConfiguration
 }) {
 	const [api, setApi] = useState<Api | undefined>()
 
@@ -23,7 +24,7 @@ export default function Sender({ channel, children }: {
 					height = opts.height + (window.outerHeight - window.innerHeight)
 				window.resizeTo(width, height)
 			}
-			const { data } = await send(id, opts)
+			const { data } = await send(id, opts, peerOpts)
 			data.addEventListener('message', event => {
 				const { evt, data } = JSON.parse(event.data),
 					{ type, clientX, clientY, ...rest } = data || { },

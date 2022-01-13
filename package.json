@@ -18,7 +18,9 @@
     "vite": "^2.7.9"
   },
   "dependencies": {
+    "@types/debounce": "^1.2.1",
     "@vitejs/plugin-react": "^1.1.4",
+    "debounce": "^1.2.1",
     "electron": "^16.0.6",
     "events": "^3.3.0",
     "react": "^17.0.2",

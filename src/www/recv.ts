@@ -1,7 +1,7 @@
 import connect from './connect'
 
-export default async function recv(channel: string) {
-	const conn = new RTCPeerConnection(),
+export default async function recv(channel: string, peerOpts?: RTCConfiguration) {
+	const conn = new RTCPeerConnection(peerOpts),
 		api = await connect(channel)
 	api.on('icecandidate', data => {
 		data && conn.addIceCandidate(new RTCIceCandidate(data))

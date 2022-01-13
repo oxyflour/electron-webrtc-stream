@@ -32,8 +32,8 @@ async function getConstrain({ width, height, devicePixelRatio }: {
 	}
 }
 
-export default async function send(channel: string, opts: any) {
-	const conn = new RTCPeerConnection(),
+export default async function send(channel: string, opts: any, peerOpts?: RTCConfiguration) {
+	const conn = new RTCPeerConnection(peerOpts),
 		api = await connect(channel)
 	api.on('icecandidate', data => {
 		data && conn.addIceCandidate(new RTCIceCandidate(data))
