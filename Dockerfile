@@ -9,7 +9,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 RUN apt-get clean
 
 WORKDIR /root
-COPY ./tool ./tool
 RUN npm config set strict-ssl false
 RUN ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ npm install electron@16.0.6
-CMD xvfb-run -a -s='-screen 0 1024x768x24 +extension GLX +render' npx electron --no-sandbox tool/electron/main.js
+COPY ./tool ./tool
+CMD npx electron --no-sandbox tool/electron/main.js

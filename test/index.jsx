@@ -10,7 +10,8 @@ function App() {
 }
 
 document.body.style.margin = document.body.style.padding = '0'
-const peerOpts = { iceServers: [{ urls: 'stun:192.168.244.147', username: 'abc', credential: 'abc', credentialType: 'password' }] }
-ReactDOM.render(<Caster peerOpts={ peerOpts } style={{ width: '100%', height: '100%' }}>
+const peerOpts = { iceServers: [{ urls: 'stun:192.168.3.2', username: 'abc', credential: 'abc', credentialType: 'password' }] }
+ReactDOM.render(<Caster peerOpts={ peerOpts }
+		style={{ objectFit: 'cover', width: '100%', height: '100%' }}>
 	<App />
 </Caster>, document.getElementById('root'))

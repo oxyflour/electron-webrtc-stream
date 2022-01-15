@@ -7,16 +7,17 @@ const peers = { } as Record<string, { id: string, role: string, res: ServerRespo
 async function start(channel: string, href: string) {
 	const url = new URL(href)
 	url.searchParams.set('send', channel)
-	// FIXME: xvfb not working
-	const cmd =
-			/*`docker run -e STARTUP_URL="${url.toString()}" nvidia-electron ` +
-			"xvfb-run -a -s='-screen 0 1024x768x24' " + */
-			"npx electron --no-sandbox tool/electron/main.js",
+	const cmd = `docker run ` +
+			`--gpus all ` +
+			`-e STARTUP_URL="${url.toString()}" ` +
+			`-e DISPLAY="${process.env.DISPLAY}" ` +
+			`-v /tmp/.X11-unix:/tmp/.X11-unix ` +
+			`nvidia-electron`,
 		env = { ...process.env, STARTUP_URL: url.toString() },
 		proc = spawn(cmd, [], { env, shell: true })
 	console.log(cmd)
-	proc.stdout.pipe(process.stdout)
-	proc.stderr.pipe(process.stderr)
+	proc.stdout.pipe(process.stdout as any)
+	proc.stderr.pipe(process.stderr as any)
 
 	let retry = 10
 	while ((retry -- > 0) && !peers[channel]?.find(peer => peer.role === 'send')) {

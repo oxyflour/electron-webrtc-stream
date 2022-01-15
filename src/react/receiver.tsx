@@ -3,10 +3,13 @@ import { useEffect, useRef, useState } from "react"
 import connect, { Api } from "../www/connect"
 import recv from "../www/recv"
 
-export default function Receiver({ channel, children, peerOpts, ...rest }: {
+export type HtmlVideoProps = React.DetailedHTMLProps<React.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>
+
+export default function Receiver({ channel, children, peerOpts, href = location.href, ...rest }: {
 	channel: string
 	peerOpts?: RTCConfiguration
-} & React.DetailedHTMLProps<React.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>) {
+	href?: string
+} & HtmlVideoProps) {
 	const ref = useRef<HTMLVideoElement>(),
 		video = ref.current,
 		[err, setErr] = useState<any>(),
@@ -24,7 +27,6 @@ export default function Receiver({ channel, children, peerOpts, ...rest }: {
 		const width = video.width = video.scrollWidth,
 			height = video.height = video.scrollHeight,
 			{ devicePixelRatio } = window,
-			{ href } = location,
 			opts = { width, height, devicePixelRatio },
 			id = Math.random().toString(16).slice(2, 10)
 		try {

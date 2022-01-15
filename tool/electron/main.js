@@ -1,7 +1,18 @@
-const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron')
+const { app, protocol, BrowserWindow, ipcMain, desktopCapturer } = require('electron')
 
 // https://github.com/electron/electron/issues/23254
 app.commandLine.appendSwitch('webrtc-max-cpu-consumption-percentage', '100')
+
+// https://github.com/electron/electron/issues/15448
+protocol.registerSchemesAsPrivileged([{
+	scheme: 'http',
+	privileges: {
+		bypassCSP: true,
+		secure: true,
+		supportFetchAPI: true,
+		corsEnabled: true,
+	}
+}])
 
 app.whenReady().then(() => {
 	const win = new BrowserWindow({
